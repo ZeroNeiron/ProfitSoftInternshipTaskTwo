@@ -5,13 +5,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import org.example.service.Writer;
 
-public class XmlFileWriter implements Writer, AutoCloseable {
-    private static final String DELIMITER = "/>";
+public class JsonFileWriter implements Writer, AutoCloseable {
     private final String outputFileName;
     private BufferedWriter bufferedWriter;
     private FileWriter fileWriter;
 
-    public XmlFileWriter(String outputFileName) {
+    public JsonFileWriter(String outputFileName) {
         this.outputFileName = outputFileName;
         createWriter();
     }
@@ -28,7 +27,7 @@ public class XmlFileWriter implements Writer, AutoCloseable {
     @Override
     public void writeToFile(String line) {
         try {
-            this.bufferedWriter.write(line.endsWith(">") ? line : line + DELIMITER);
+            this.bufferedWriter.write(line);
             this.bufferedWriter.flush();
         } catch (IOException e) {
             throw new RuntimeException("Can`t write data to file");

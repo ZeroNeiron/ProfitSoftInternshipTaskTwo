@@ -6,12 +6,14 @@ import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 import org.example.service.Reader;
 
-public class XmlFileReader implements Reader {
-    private static final String DELIMITER = "/>";
+public class XmlFileReader implements Reader, AutoCloseable {
+    private String delimiter;
     private final String inputFileName;
     private Scanner scanner;
+    private FileInputStream fileInputStream;
 
-    public XmlFileReader(String inputFileName) {
+    public XmlFileReader(String inputFileName, String delimiter) {
+        this.delimiter = delimiter;
         this.inputFileName = inputFileName;
         createScanner();
     }
@@ -21,15 +23,23 @@ public class XmlFileReader implements Reader {
         if (scanner.hasNext()) {
             return scanner.next();
         }
+        scanner.close();
         return "";
     }
 
-    private void createScanner(){
+    private void createScanner() {
         try {
-            FileInputStream fileInputStream = new FileInputStream(inputFileName);
-            this.scanner = new Scanner(fileInputStream, StandardCharsets.UTF_8).useDelimiter(DELIMITER);
+            this.fileInputStream = new FileInputStream(inputFileName);
+            this.scanner = new Scanner(fileInputStream,
+                    StandardCharsets.UTF_8).useDelimiter(delimiter);
         } catch (IOException e) {
-            throw new RuntimeException("Can`t read data from file");
+            throw new RuntimeException("Can`t read data from file", e);
         }
+    }
+
+    @Override
+    public void close() throws Exception {
+        scanner.close();
+        fileInputStream.close();
     }
 }
